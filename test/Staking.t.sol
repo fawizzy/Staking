@@ -131,5 +131,23 @@ contract StakingTest is Test {
 
     }
 
+    function test_earned() external {
+
+        console.log(staking.earned(bob));
+        uint256 bobInitialEarned = staking.earned(bob);
+        test_can_stake_successfully();
+        
+        vm.startPrank(owner);
+        staking.setRewardsDuration(1 weeks);
+         deal(address(rewardToken), owner, 100 ether);
+         IERC20(address(rewardToken)).transfer(address(staking), 100 ether);
+         staking.notifyRewardAmount(100 ether);
+        vm.warp(1 days);  
+        assertLt(bobInitialEarned, staking.earned(bob), "no reward earned");
+
+
+        console.log(staking.earned(bob));      
+    }
+
 
 }
