@@ -133,7 +133,6 @@ contract StakingTest is Test {
 
     function test_earned() external {
 
-        console.log(staking.earned(bob));
         uint256 bobInitialEarned = staking.earned(bob);
         test_can_stake_successfully();
         
@@ -144,9 +143,44 @@ contract StakingTest is Test {
          staking.notifyRewardAmount(100 ether);
         vm.warp(1 days);  
         assertLt(bobInitialEarned, staking.earned(bob), "no reward earned");
+    }
 
+    function test_lastTimeRewardApplicable() external {
+        deal(address(rewardToken), owner, 100 ether);
+        vm.warp(2 weeks);
+        vm.startPrank(owner);
+        staking.setRewardsDuration(1 weeks);
+        
+        
+        // check lastTimeRewardApplicable before notifyRewardAmount
+        assertEq(staking.lastTimeRewardApplicable(), staking.finishAt());
+        IERC20(address(rewardToken)).transfer(address(staking), 100 ether);
+        staking.notifyRewardAmount(100 ether);
 
-        console.log(staking.earned(bob));      
+        // check lastTimeRewardApplicable after notifyRewardAmount
+        assertEq(staking.lastTimeRewardApplicable(), block.timestamp);
+    }
+
+    function test_rewardPerToken() external {
+        uint256 initialRewardPerTokenStored = staking.rewardPerTokenStored();
+        assertEq(staking.rewardPerToken(), initialRewardPerTokenStored);
+        uint256 initialTotalSupply = staking.totalSupply();
+        test_can_stake_successfully();
+        
+
+        vm.startPrank(owner);
+        staking.setRewardsDuration(1 weeks);
+        
+        
+        // check lastTimeRewardApplicable before notifyRewardAmount
+        assertEq(staking.lastTimeRewardApplicable(), staking.finishAt());
+        deal(address(rewardToken), owner, 100 ether);
+        IERC20(address(rewardToken)).transfer(address(staking), 100 ether);
+        staking.notifyRewardAmount(100 ether);
+
+        vm.warp(1 weeks);
+        console.log(staking.rewardPerTokenStored());
+        assertGt(staking.rewardPerToken(),initialRewardPerTokenStored);
     }
 
 
