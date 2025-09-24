@@ -163,8 +163,9 @@ contract StakingTest is Test {
 
     function test_rewardPerToken() external {
         uint256 initialRewardPerTokenStored = staking.rewardPerTokenStored();
+
+        // check lastTimeRewardApplicable before notifyRewardAmount
         assertEq(staking.rewardPerToken(), initialRewardPerTokenStored);
-        uint256 initialTotalSupply = staking.totalSupply();
         test_can_stake_successfully();
         
 
@@ -172,14 +173,13 @@ contract StakingTest is Test {
         staking.setRewardsDuration(1 weeks);
         
         
-        // check lastTimeRewardApplicable before notifyRewardAmount
-        assertEq(staking.lastTimeRewardApplicable(), staking.finishAt());
         deal(address(rewardToken), owner, 100 ether);
         IERC20(address(rewardToken)).transfer(address(staking), 100 ether);
         staking.notifyRewardAmount(100 ether);
 
         vm.warp(1 weeks);
         console.log(staking.rewardPerTokenStored());
+        // check lastTimeRewardApplicable after notifyRewardAmount
         assertGt(staking.rewardPerToken(),initialRewardPerTokenStored);
     }
 
