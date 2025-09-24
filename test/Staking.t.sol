@@ -105,7 +105,14 @@ contract StakingTest is Test {
         // trigger setRewards distribution revert
         vm.expectRevert("reward duration not finished");
         staking.setRewardsDuration(1 weeks);
-    
+
+        // test for when block.timestamp >= finishAt
+        deal(address(rewardToken), owner, 100 ether);
+        vm.warp(1 weeks);
+        IERC20(address(rewardToken)).transfer(address(staking), 100 ether);
+        uint256 remainingRewards = (staking.finishAt() - block.timestamp) * staking.rewardRate();
+        staking.notifyRewardAmount(100 ether);
+        assertEq(staking.rewardRate(), (uint256(100 ether) + remainingRewards)/uint256(1 weeks));    
     }
 
     function test_getRewards() public {
