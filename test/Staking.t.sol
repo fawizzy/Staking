@@ -89,8 +89,8 @@ contract StakingTest is Test {
         IERC20(address(rewardToken)).transfer(address(staking), 100 ether);
         
         // trigger revert
-        // vm.expectRevert("reward rate = 0");
-        staking.notifyRewardAmount(100 ether);
+        vm.expectRevert("reward rate = 0");
+        staking.notifyRewardAmount(10);
     
         // trigger second revert
         vm.expectRevert("reward amount > balance");
@@ -113,8 +113,14 @@ contract StakingTest is Test {
         vm.stopPrank();
         test_notify_Rewards();
         vm.startPrank(bob);
-        vm.warp(block.timestamp + 1 days);
+        uint256 initialRewardBalance = rewardToken.balanceOf(bob);
+        // console.log(initialRewardBalance);
+        vm.warp(block.timestamp + 1 weeks);
         staking.getReward();
+        // console.log( rewardToken.balanceOf(bob));
+
+        assertLt(initialRewardBalance,rewardToken.balanceOf(bob), "no rewards withdrawn");
+
 
     }
 

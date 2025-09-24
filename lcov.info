@@ -60,9 +60,9 @@ FN:84,StakingRewards.getReward
 FNDA:1,StakingRewards.getReward
 DA:85,1
 DA:86,1
-BRDA:86,5,0,1
-DA:87,1
-DA:88,1
+BRDA:86,5,0,-
+DA:87,0
+DA:88,0
 DA:92,6
 FN:92,StakingRewards.setRewardsDuration
 FNDA:6,StakingRewards.setRewardsDuration
@@ -94,7 +94,7 @@ DA:113,20
 FNF:12
 FNH:9
 LF:50
-LH:45
+LH:43
 BRF:17
-BRH:16
+BRH:15
 end_of_record
